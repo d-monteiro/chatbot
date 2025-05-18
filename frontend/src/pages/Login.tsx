@@ -80,16 +80,16 @@ const Login = () => {
                   className="w-full bg-green-800 hover:bg-green-900"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? "Signing in..." : "Sign in"}
+                  {isSubmitting ? "A entrar..." : "Entrar"}
                 </Button>
               </div>
             </form>
             
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
-                Don't have an account?{" "}
-                <a href="/register" className="text-chatbot-primary hover:underline">
-                  Register
+                Ainda não tens conta?{" "}
+                <a href="/register" className="text-chatbot-primary hover:underline text-green-900">
+                  Regista-te
                 </a>
               </p>
             </div>

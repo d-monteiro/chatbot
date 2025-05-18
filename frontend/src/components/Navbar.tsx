@@ -21,20 +21,20 @@ const Navbar = () => {
             to="/about" 
             className="text-black hover:text-chatbot-primary transition-colors text-lg md:text-xl font-medium no-underline"
           >
-            About Us
+            Sobre nós
           </Link>
           <Button 
             variant="outline" 
             className="border-gray-350 text-black bg-white hover:bg-white/90 text-lg md:text-xl px-6 md:px-8 py-3"
             onClick={() => navigate('/login')}
           >
-            Log in
+            Login
           </Button>
           <Button 
             className="bg-green-800 text-white hover:bg-green-900 text-lg md:text-xl px-6 md:px-8 py-3"
             onClick={() => navigate('/register')}
           >
-            Register
+            Registo
           </Button>
         </div>
       </div>

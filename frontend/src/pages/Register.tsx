@@ -28,7 +28,7 @@ const Register = () => {
   
   // Validate passwords match
   if (formData.password !== formData.confirmPassword) {
-    setError("Passwords don't match");
+    setError("Passwords não são iguais");
     return;
   }
   
@@ -40,7 +40,7 @@ const Register = () => {
     navigate("/chat");
     
   } catch (err) {
-    setError(err instanceof Error ? err.message : "Falha no registro");
+    setError(err instanceof Error ? err.message : "Falha no registo");
   } finally {
     setLoading(false);
   }
@@ -53,7 +53,7 @@ const Register = () => {
       <main className="flex-grow flex items-center justify-center px-6 md:px-12 pt-20">
         <div className="max-w-md w-full mx-auto">
           <div className="bg-white p-8 rounded-lg shadow-md border-2 border-gray-200">
-            <h1 className="text-3xl font-bold mb-6 text-center">Register</h1>
+            <h1 className="text-3xl font-bold mb-6 text-center">Registo</h1>
             
             {error && (
               <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
@@ -64,7 +64,7 @@ const Register = () => {
             <form className="space-y-6" onSubmit={handleSubmit}>
               <div className="space-y-2">
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                  Full Name
+                  Nome
                 </label>
                 <input
                   id="name"
@@ -109,7 +109,7 @@ const Register = () => {
               
               <div className="space-y-2">
                 <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                  Confirm Password
+                  Confirmar Password
                 </label>
                 <input
                   id="confirmPassword"
@@ -128,15 +128,15 @@ const Register = () => {
                   className="w-full bg-green-800 hover:bg-green-900"
                   disabled={loading}
                 >
-                  {loading ? "Criando conta..." : "Create Account"}
+                  {loading ? "A criar conta..." : "Criar Conta"}
                 </Button>
               </div>
             </form>
             
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
-                Already have an account?{" "}
-                <a href="/login" className="text-chatbot-primary hover:underline">
+                Já tens conta?{" "}
+                <a href="/login" className="text-chatbot-primary hover:underline text-green-900">
                   Login
                 </a>
               </p>
