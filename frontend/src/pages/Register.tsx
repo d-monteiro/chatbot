@@ -40,6 +40,7 @@ const Register = () => {
     try {
       setLoading(true);
       
+      console.log("Attempting to register user...");
       const response = await fetch("http://localhost:5000/api/v1/auth/register", {
         method: "POST",
         headers: {
@@ -52,7 +53,15 @@ const Register = () => {
         })
       });
       
-      const data = await response.json();
+      console.log("Response status:", response.status);
+      
+      // Try to get the raw response text first
+      const responseText = await response.text();
+      console.log("Raw response:", responseText);
+      
+      // Then parse it as JSON if it's not empty
+      const data = responseText ? JSON.parse(responseText) : {};
+      console.log("Parsed data:", data);
       
       if (!data.success) {
         throw new Error(data.message || "Falha no registro");
