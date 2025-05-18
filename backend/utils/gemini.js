@@ -52,6 +52,7 @@ async function generateEmbeddingsBatch(texts) {
     const embeddings = [];
     
     for (let i = 0; i < texts.length; i += batchSize) {
+      console.log(`Generating batch ${i+1}`);
       const batch = texts.slice(i, i + batchSize);
       const batchPromises = batch.map(text => generateEmbedding(text));
       const batchResults = await Promise.all(batchPromises);
