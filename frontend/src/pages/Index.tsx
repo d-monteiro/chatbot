@@ -15,7 +15,7 @@ const Index = () => {
           <div className="space-y-6 z-10 bg-white/80 p-6 md:p-8 rounded-lg">
             <div className="mb-4">
               <h1 className="text-3xl md:text-5xl font-serif font-bold leading-tight mb-2 text-black">
-                <span className="text-chatbot-primary">ChatBot</span>
+                <span className="text-chatbot-primary">Vota</span>
                 <span className="text-black">AI</span>
               </h1>
             </div>
