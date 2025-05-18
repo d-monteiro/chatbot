@@ -5,14 +5,13 @@ const dotenv = require('dotenv');
 const path = require('path');
 const { generateEmbedding, generateResponse } = require('../utils/gemini');
 const { querySimilar, getIndexStats } = require('../utils/pinecone');
-const connectDB = require('./db'); // Import database connection
+const connectDB = require('./db');
 
 // Load environment variables
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const port = process.env.PORT || 5000;  
 
-const connectDB = require('./db');
 
 // Connect to database
 connectDB();

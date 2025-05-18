@@ -2,8 +2,10 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/context/AuthContext";
 
 const Register = () => {
+  const { register } = useAuth();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
@@ -22,66 +24,27 @@ const Register = () => {
   };
   
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
+  e.preventDefault(); // Add this line to prevent form data appearing in URL
+  
+  // Validate passwords match
+  if (formData.password !== formData.confirmPassword) {
+    setError("Passwords don't match");
+    return;
+  }
+  
+  try {
+    setLoading(true);
     
-    // Validate passwords match
-    if (formData.password !== formData.confirmPassword) {
-      setError("As senhas não correspondem");
-      return;
-    }
+    // Use the register function from AuthContext
+    await register(formData.name, formData.email, formData.password);
+    navigate("/chat");
     
-    // Validate password length
-    if (formData.password.length < 6) {
-      setError("A senha deve ter pelo menos 6 caracteres");
-      return;
-    }
-    
-    try {
-      setLoading(true);
-      
-      console.log("Attempting to register user...");
-      const response = await fetch("http://localhost:5000/api/v1/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          password: formData.password
-        })
-      });
-      
-      console.log("Response status:", response.status);
-      
-      // Try to get the raw response text first
-      const responseText = await response.text();
-      console.log("Raw response:", responseText);
-      
-      // Then parse it as JSON if it's not empty
-      const data = responseText ? JSON.parse(responseText) : {};
-      console.log("Parsed data:", data);
-      
-      if (!data.success) {
-        throw new Error(data.message || "Falha no registro");
-      }
-      
-      // Store token in localStorage
-      localStorage.setItem("token", data.token);
-      
-      // Store user data
-      localStorage.setItem("user", JSON.stringify(data.user));
-      
-      // Show success and redirect to login
-      alert("Registro realizado com sucesso!");
-      navigate("/chat");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Falha no registro");
-    } finally {
-      setLoading(false);
-    }
-  };
+  } catch (err) {
+    setError(err instanceof Error ? err.message : "Falha no registro");
+  } finally {
+    setLoading(false);
+  }
+};
   
   return (
     <div className="h-screen flex flex-col relative overflow-hidden">
