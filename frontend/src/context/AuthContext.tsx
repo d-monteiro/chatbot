@@ -33,7 +33,7 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 // API base URL - make sure to update this to match your backend URL
-const API_URL = import.meta.env.API_URL || 'https://localhost:5000';
+const API_URL = import.meta.env.API_URL || 'https://chatbot-vplp.onrender.com';
 console.log(API_URL);
 
 // Custom hook to use auth context
