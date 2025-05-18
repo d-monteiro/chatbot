@@ -1,10 +1,10 @@
 // scripts/uploadDocs.js
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
-const { loadDocumentsFromDirectory } = require('documentLoader');
-const { processDocumentIntoChunks } = require('textSplitter');
-const { generateEmbeddingsBatch } = require('gemini');
-const { upsertVectors, getIndexStats } = require('pinecone');
+const { loadDocumentsFromDirectory } = require('./documentLoader');
+const { processDocumentIntoChunks } = require('./textSplitter');
+const { generateEmbeddingsBatch } = require('./gemini');
+const { upsertVectors, getIndexStats } = require('./pinecone');
 
 // Configuration for document processing
 const DOCS_DIRECTORY = path.resolve(__dirname, '../documents');
@@ -38,14 +38,35 @@ async function processAndUploadDocuments() {
     const embeddings = await generateEmbeddingsBatch(textChunks);
     
     // Prepare vectors for Pinecone
-    const vectors = allChunks.map((chunk, i) => ({
-      id: uuidv4(),
-      values: embeddings[i],
-      metadata: {
-        ...chunk.metadata,
-        text: chunk.content.slice(0, 100) + '...' // Store a preview of the text in metadata
-      }
-    }));
+    const vectors = allChunks.map((chunk, i) => {
+    // Extract metadata fields and flatten them
+    const flatMetadata = {};
+    
+    // Add chunk text preview
+    flatMetadata.text_preview = chunk.content.slice(0, 100) + '...';
+    
+    // Add all metadata fields as direct properties
+    if (chunk.metadata) {
+        Object.keys(chunk.metadata).forEach(key => {
+        const value = chunk.metadata[key];
+        // Ensure value is a simple type (string, number, boolean)
+        if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+            flatMetadata[key] = value;
+        } else if (Array.isArray(value) && value.every(item => typeof item === 'string')) {
+            flatMetadata[key] = value;
+        } else {
+            // Convert complex values to string
+            flatMetadata[key] = JSON.stringify(value);
+        }
+        });
+    }
+    
+    return {
+        id: uuidv4(),
+        values: embeddings[i],
+        metadata: flatMetadata
+    };
+    });
     
     // Upload vectors to Pinecone
     console.log(`Uploading ${vectors.length} vectors to Pinecone...`);
