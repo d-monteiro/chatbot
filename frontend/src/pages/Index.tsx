@@ -1,8 +1,6 @@
 // import React from "react";
 import Navbar from "@/components/Navbar";
-import BackgroundSlideshow from "@/components/BackgroundSlideshow";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const Index = () => {

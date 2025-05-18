@@ -1,4 +1,5 @@
-import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import type { ReactNode } from 'react';
 
 // Define user type
 interface User {
@@ -32,7 +33,7 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 // API base URL - make sure to update this to match your backend URL
-const API_URL = import.meta.env.API_URL || 'https://chatbot-vplp.onrender.com';
+const API_URL = import.meta.env.API_URL || 'https://localhost:5000';
 console.log(API_URL);
 
 // Custom hook to use auth context
