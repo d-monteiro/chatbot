@@ -5,6 +5,7 @@ const dotenv = require('dotenv');
 const path = require('path');
 const { generateEmbedding, generateResponse } = require('../utils/gemini');
 const { querySimilar, getIndexStats } = require('../utils/pinecone');
+const connectDB = require('./db'); // Import database connection
 
 // Load environment variables
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
@@ -13,12 +14,13 @@ const port = process.env.PORT || 5000;
 
 const connectDB = require('./db');
 
-// Conectar ao banco de dados
+// Connect to database
 connectDB();
 
 // Importar rotas
 const auth = require('./routes');
 
+// Initialize Express app
 const app = express();
 
 // Middleware
@@ -33,6 +35,7 @@ app.use('/api', auth);
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', message: 'Server is running' });
 });
+
 
 app.get('/api/test', (req, res) => {
   res.status(200).json({ message: 'API is working' });
