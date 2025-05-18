@@ -32,7 +32,8 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 // API base URL - make sure to update this to match your backend URL
-const API_URL = 'http://localhost:5000/api';
+const API_URL = import.meta.env.API_URL || 'https://chatbot-vplp.onrender.com';
+console.log(API_URL);
 
 // Custom hook to use auth context
 export const useAuth = () => useContext(AuthContext);
@@ -63,7 +64,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setToken(storedToken);
         
         // Fetch user data from the server
-        const response = await fetch(`${API_URL}/me`, {
+        const response = await fetch(`${API_URL}/api/me`, {
           headers: {
             Authorization: `Bearer ${storedToken}`
           }
@@ -95,7 +96,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setError(null);
     
     try {
-      const response = await fetch(`${API_URL}/register`, {
+      const response = await fetch(`${API_URL}/api/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -127,7 +128,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setError(null);
     
     try {
-      const response = await fetch(`${API_URL}/login`, {
+      const response = await fetch(`${API_URL}/api/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -159,7 +160,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       // Call logout endpoint for server cleanup (if needed)
       if (token) {
-        await fetch(`${API_URL}/logout`, {
+        await fetch(`${API_URL}/api/logout`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
