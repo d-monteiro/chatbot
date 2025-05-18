@@ -9,25 +9,33 @@ const { querySimilar, getIndexStats } = require('../utils/pinecone');
 // Load environment variables
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
-// Initialize Express app
+const port = process.env.PORT || 5000;  
+
+const connectDB = require('./db');
+
+// Conectar ao banco de dados
+connectDB();
+
+// Importar rotas
+const auth = require('./routes');
+
 const app = express();
-const port = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors());
 app.use(express.json());
+app.use(cors());
 
-// Import routes if they exist
-try {
-  const routes = require('./routes');
-  app.use('/api', routes);
-} catch (error) {
-  console.log('Routes not loaded: ', error.message);
-}
+// Definir rotas
+app.use('/api', auth);
+
 
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', message: 'Server is running' });
+});
+
+app.get('/api/test', (req, res) => {
+  res.status(200).json({ message: 'API is working' });
 });
 
 // Basic route
