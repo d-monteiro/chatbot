@@ -5,6 +5,8 @@ import ChatPage from "./pages/ChatPage";
 import NotFound from "./pages/NotFound";
 import About from "./pages/About";
 import SomethingWentWrong from "./pages/SomethingWentWrong";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 
 const AppRouter: React.FC = () => (
     <Router>
@@ -12,8 +14,10 @@ const AppRouter: React.FC = () => (
             <Route path="/" element={<Index />} />
             <Route path="/chat" element={<ChatPage />} />
             <Route path="/about" element={<About />} />
-            <Route path="*" element={<NotFound />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
             <Route path="/error" element={<SomethingWentWrong />} />
+            <Route path="*" element={<NotFound />} />
         </Routes>
     </Router>
 );
