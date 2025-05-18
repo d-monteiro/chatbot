@@ -10,40 +10,35 @@ const connectDB = require('./db'); // Import database connection
 // Load environment variables
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
+const port = process.env.PORT || 5000;  
+
+const connectDB = require('./db');
+
 // Connect to database
 connectDB();
 
+// Importar rotas
+const auth = require('./routes');
+
 // Initialize Express app
 const app = express();
-const port = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors({
-  origin: '*', // Allow all origins - replace with your frontend URL in production
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
 app.use(express.json());
+app.use(cors());
 
-// Import routes if they exist
-try {
-  const routes = require('./routes');
-  app.use('/api', routes);
-} catch (error) {
-  console.log('Routes not loaded: ', error.message);
-}
+// Definir rotas
+app.use('/api', auth);
+
 
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', message: 'Server is running' });
 });
 
-// Debug route to test API connectivity
-app.get('/api/debug', (req, res) => {
-  res.status(200).json({ 
-    message: 'API is working correctly', 
-    timestamp: new Date().toISOString() 
-  });
+
+app.get('/api/test', (req, res) => {
+  res.status(200).json({ message: 'API is working' });
 });
 
 // Basic route
