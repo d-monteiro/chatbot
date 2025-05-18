@@ -21,12 +21,20 @@ const auth = require('./routes');
 // Initialize Express app
 const app = express();
 
+// Import file upload routes
+const fileUploadRoutes = require('./fileUpload');
+
 // Middleware
-app.use(express.json());
-app.use(cors());
+app.use(express.json({ limit: '10mb' }));
+app.use(cors({
+  origin: ['http://localhost:3000', 'http://localhost:5173'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
 
 // Definir rotas
 app.use('/api', auth);
+app.use('/api/files', fileUploadRoutes);
 
 
 // Health check endpoint
@@ -135,30 +143,78 @@ app.post('/api/query', async (req, res) => {
     }
     
     console.log(`Processing query: "${query}"`);
+    console.log(`Request payload:`, JSON.stringify(req.body, null, 2));
     
     // Generate embedding for the query
     console.log('Generating query embedding...');
     const queryVector = await generateEmbedding(query);
+    console.log(`Generated embedding with ${queryVector.length} dimensions`);
     
     // Query Pinecone for similar chunks
     console.log(`Retrieving top ${topK} most similar chunks...`);
     const similarChunks = await querySimilar(queryVector, topK, filter);
+    console.log(`Retrieved ${similarChunks.length} chunks from Pinecone`);
     
     // Extract text from the retrieved chunks
-    const retrievedTexts = similarChunks.map(chunk => chunk.metadata.text || '');
+    const retrievedTexts = similarChunks.map(chunk => {
+      let text = '';
+      
+      try {
+        // First check if there's a direct text field
+        if (chunk.metadata.text) {
+          text = chunk.metadata.text;
+          console.log(`Found text in metadata.text (${text.length} chars)`);
+        } 
+        // Then check if text is in the metadata that was stringified during upload
+        else if (chunk.metadata.metadata) {
+          try {
+            const parsedMetadata = JSON.parse(chunk.metadata.metadata);
+            if (parsedMetadata.text) {
+              text = parsedMetadata.text;
+              console.log(`Found text in parsed metadata.metadata.text (${text.length} chars)`);
+            }
+          } catch (e) {
+            console.error('Error parsing chunk metadata:', e);
+          }
+        }
+        
+        // If still no text, use the text_preview
+        if (!text) {
+          text = chunk.metadata.text_preview || '';
+          console.log(`Using text_preview as fallback (${text.length} chars)`);
+        }
+        
+        console.log(`Chunk ID: ${chunk.id}, Score: ${chunk.score}, Text length: ${text.length}, Metadata keys: ${Object.keys(chunk.metadata || {}).join(', ')}`);
+        
+        return text;
+      } catch (error) {
+        console.error('Error processing chunk metadata:', error);
+        return chunk.metadata.text_preview || '';
+      }
+    });
+    
+    console.log(`Number of context documents retrieved: ${retrievedTexts.length}`);
+    if (retrievedTexts.length > 0) {
+      console.log(`First context preview: ${retrievedTexts[0].substring(0, 100)}...`);
+    } else {
+      console.log('No context documents retrieved');
+    }
     
     // Generate response with Gemini using the retrieved context
     console.log('Generating response with Gemini...');
     const response = await generateResponse(query, retrievedTexts);
     
     // Return the response along with the source chunks for reference
+    console.log('Response generated successfully');
+    
     res.json({
       response,
+      contextsUsed: retrievedTexts.length > 0,
       sources: similarChunks.map(chunk => ({
         score: chunk.score,
         metadata: {
-          fileName: chunk.metadata.fileName,
-          filePath: chunk.metadata.filePath,
+          fileName: chunk.metadata.fileName || (chunk.metadata.metadata ? JSON.parse(chunk.metadata.metadata).fileName : 'Unknown'),
+          filePath: chunk.metadata.filePath || (chunk.metadata.metadata ? JSON.parse(chunk.metadata.metadata).filePath : 'Unknown'),
           chunkIndex: chunk.metadata.chunkIndex
         }
       }))

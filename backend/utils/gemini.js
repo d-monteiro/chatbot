@@ -20,7 +20,7 @@ const geminiProModel = genAI.getGenerativeModel({
 });
 
 // Model for embeddings
-const embedModel = genAI.getGenerativeModel({ model: 'embedding-001' });
+const embedModel = genAI.getGenerativeModel({ model: 'models/text-embedding-004' });
 
 /**
  * Generate embeddings for a text using Gemini's embedding model
@@ -84,8 +84,9 @@ async function generateResponse(query, contexts = []) {
     
     // Create prompt with context
     const prompt = `
-        You are an AI assistant that provides accurate and helpful responses based on the provided context.
-
+        You are an AI assistant that provides accurate and helpful responses about the portuguese elections and the parties that are running.
+        You have access to a set of documents that provide context for your answers.
+        Your task is to answer the user's query based on the context provided.
         Context:
         ${context}
 
@@ -93,8 +94,18 @@ async function generateResponse(query, contexts = []) {
 
         Provide a comprehensive answer to the user's query based on the context provided. 
         If the context doesn't contain relevant information to answer the query, acknowledge this limitation 
-        and provide a general response based on your knowledge.
+        and provide a general response based on your knowledge. Do not refer to "the text" or "the document" or "the context" in your response when you do have the context at hand.
         `;
+
+
+        // Log the contexts being used
+        console.log(`Using ${contexts.length} contexts for query: "${query}"`);
+        if (contexts.length > 0) {
+          console.log('Contexts:');
+        } else {
+          console.log('No contexts available. Using only the model\'s knowledge.');
+        }
+
 
     const result = await geminiProModel.generateContent({
       contents: [{ role: 'user', parts: [{ text: prompt }] }],

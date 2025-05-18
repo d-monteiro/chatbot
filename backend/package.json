@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node src/server.js",
     "upload": "node utils/uploadDocs.js",
+    "upload-single": "node utils/uploadSingleDoc.js",
     "dev": "nodemon src/server.js"
   },
   "keywords": [],
@@ -25,6 +26,7 @@
     "mammoth": "^1.9.0",
     "mongodb": "^6.16.0",
     "mongoose": "^8.15.0",
+    "multer": "^1.4.5-lts.2",
     "pdf-parse": "^1.1.1",
     "uuid": "^11.1.0"
   },
