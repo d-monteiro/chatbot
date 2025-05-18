@@ -1,7 +1,7 @@
 const User = require('./user');
 
 // @desc    Registrar usuário
-// @route   POST /api/v1/auth/register
+// @route   POST /api/register
 // @access  Public
 exports.register = async (req, res, next) => {
   try {
@@ -12,7 +12,7 @@ exports.register = async (req, res, next) => {
     if (existingUser) {
       return res.status(400).json({
         success: false,
-        message: 'Email já registrado'
+        message: 'Email já registado'
       });
     }
 
@@ -29,13 +29,13 @@ exports.register = async (req, res, next) => {
     console.error(error);
     res.status(500).json({
       success: false,
-      message: 'Erro ao registrar usuário'
+      message: 'Erro ao registrar utilizador'
     });
   }
 };
 
 // @desc    Login de usuário
-// @route   POST /api/v1/auth/login
+// @route   POST /api/login
 // @access  Public
 exports.login = async (req, res, next) => {
   try {
@@ -79,7 +79,7 @@ exports.login = async (req, res, next) => {
 };
 
 // @desc    Obter usuário atual
-// @route   GET /api/v1/auth/me
+// @route   GET /api/me
 // @access  Private
 exports.getMe = async (req, res, next) => {
   try {
@@ -99,7 +99,7 @@ exports.getMe = async (req, res, next) => {
 };
 
 // @desc    Logout de usuário / limpar cookie
-// @route   GET /api/v1/auth/logout
+// @route   GET /api/logout
 // @access  Private
 exports.logout = async (req, res, next) => {
   res.status(200).json({
