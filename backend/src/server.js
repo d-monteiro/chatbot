@@ -12,8 +12,6 @@ dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const port = process.env.PORT || 5000;  
 
-const connectDB = require('./db');
-
 // Connect to database
 connectDB();
 

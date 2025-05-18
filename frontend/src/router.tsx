@@ -16,9 +16,9 @@ const AppRouter: React.FC = () => (
         <AuthProvider>
             <Routes>
                 <Route element={<ProtectedRoute />}>
-                    <Route path="/chat" element={<ChatPage />} />
+                    
                 </Route>
-
+                    <Route path="/chat" element={<ChatPage />} />
                     <Route path="/" element={<Index />} />
                     <Route path="/about" element={<About />} />
                     <Route path="/login" element={<Login />} />

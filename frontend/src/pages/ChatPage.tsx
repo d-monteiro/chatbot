@@ -68,9 +68,9 @@ const ChatPage = () => {
   }, [messages]);
   
   // Handler for sending a new message
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (inputMessage.trim() === "") return;
-    
+
     // Add user message
     const newUserMessage: Message = {
       id: messages.length + 1,
@@ -78,20 +78,46 @@ const ChatPage = () => {
       sender: "user",
       timestamp: new Date(),
     };
-    
+
     setMessages((prev) => [...prev, newUserMessage]);
     setInputMessage("");
-    
-    // Simulate bot response after a delay
-    setTimeout(() => {
+
+    try {
+      // Send user message to backend API
+      const response = await fetch("http://localhost:5000/api/query", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ 
+          query: inputMessage,
+          filter: { collection: "default" }  // Add this filter object
+        }),
+      });
+      
+      const data = await response.json();
+      console.log("Backend response:", data);
+      
+      if (data.error) {
+        throw new Error(data.error);
+      }
+      
       const botMessage: Message = {
         id: messages.length + 2,
-        content: `I received your message: "${inputMessage}". This is a simulated response from VotaAI.`,
+        content: data.response || "Sorry, I didn't understand that.",
         sender: "bot",
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, botMessage]);
-    }, 1000);
+    } catch (error) {
+      const botMessage: Message = {
+        id: messages.length + 2,
+        content: `Error: ${error instanceof Error ? error.message : "Unknown error"}`,
+        sender: "bot",
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, botMessage]);
+    }
   };
   
   // Handler for pressing Enter to send a message
