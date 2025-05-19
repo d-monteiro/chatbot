@@ -65,12 +65,10 @@ const ChatPage = () => {
   // Auto-scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-  
-  // Handler for sending a new message
-  const handleSendMessage = () => {
+  }, [messages]);      // Handler for sending a new message
+  const handleSendMessage = async () => {
     if (inputMessage.trim() === "") return;
-    
+
     // Add user message
     const newUserMessage: Message = {
       id: messages.length + 1,
@@ -78,20 +76,69 @@ const ChatPage = () => {
       sender: "user",
       timestamp: new Date(),
     };
-    
+
     setMessages((prev) => [...prev, newUserMessage]);
     setInputMessage("");
-    
-    // Simulate bot response after a delay
-    setTimeout(() => {
-      const botMessage: Message = {
+
+    try {
+      // Add a "thinking" message
+      const thinkingMessage: Message = {
         id: messages.length + 2,
-        content: `I received your message: "${inputMessage}". This is a simulated response from VotaAI.`,
+        content: "Thinking...",
         sender: "bot",
         timestamp: new Date(),
       };
-      setMessages((prev) => [...prev, botMessage]);
-    }, 1000);
+      setMessages((prev) => [...prev, thinkingMessage]);
+
+      // Send user message to backend API
+      const response = await fetch("http://localhost:5000/api/query", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ 
+          query: inputMessage,
+          topK: 5
+        }),
+      });
+      
+      const data = await response.json();
+      console.log("Backend response:", data);
+      
+      if (data.error) {
+        throw new Error(data.error);
+      }
+      
+      // Remove the thinking message and add the real response
+      setMessages((prev) => {
+        const filteredMessages = prev.filter(msg => msg.id !== thinkingMessage.id);
+        const botMessage: Message = {
+          id: messages.length + 3,
+          content: data.response || "Sorry, I didn't understand that.",
+          sender: "bot",
+          timestamp: new Date(),
+        };
+        
+        // Add information about whether context was used
+        if (data.contextsUsed === false) {
+          botMessage.content += "\n\n(Note: No context was used for this response. Using only the model's general knowledge.)"
+        }
+        
+        return [...filteredMessages, botMessage];
+      });
+    } catch (error) {
+      // Remove the thinking message and add the error message
+      setMessages((prev) => {
+        const filteredMessages = prev.filter(msg => msg.content === "Thinking...");
+        const errorMessage: Message = {
+          id: messages.length + 3,
+          content: `Error: ${error instanceof Error ? error.message : "Unknown error"}`,
+          sender: "bot",
+          timestamp: new Date(),
+        };
+        return [...filteredMessages, errorMessage];
+      });
+    }
   };
   
   // Handler for pressing Enter to send a message

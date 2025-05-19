@@ -44,6 +44,8 @@ async function processAndUploadDocuments() {
     
     // Add chunk text preview
     flatMetadata.text_preview = chunk.content.slice(0, 100) + '...';
+    // Add full text content
+    flatMetadata.text = chunk.content;
     
     // Add all metadata fields as direct properties
     if (chunk.metadata) {
